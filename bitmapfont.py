@@ -44,8 +44,18 @@ class BitmapFont:
         if x < -self._font_width or x >= self._width or \
            y < -self._font_height or y >= self._height:
             return
-        # Go through each column of the character.
-        for char_x in range(self._font_width):
+
+        # Determine the columns to render
+        if x < 0:
+            startColumn = abs(x)
+            widthToDisplay = self._font_width - abs(x)
+        else:
+            startColumn = 0
+            widthToDisplay = min(self._font_width, self._width - x)
+        endColumn = startColumn + widthToDisplay
+        
+        # Go through the needed columnd of the character.
+        for char_x in range(startColumn, endColumn):
             # Grab the byte for the current column of font data.
             self._font.seek(2 + (ord(ch) * self._font_width) + char_x)
             line = ustruct.unpack('B', self._font.read(1))[0]
